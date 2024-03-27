@@ -1,5 +1,8 @@
+main\CollisionChecker.class
 main\GamePanel.class
-Entity\Entity.class
+tile\Tile.class
 main\KeyControl.class
+tile\TileManager.class
+Entity\Entity.class
 Entity\Player.class
 main\main.class

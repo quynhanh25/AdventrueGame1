@@ -8,6 +8,7 @@ import main.GamePanel;
 import main.KeyControl;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -20,28 +21,39 @@ import javax.imageio.ImageIO;
 public class Player extends Entity {
     GamePanel gp;
     KeyControl keyC;
+    public final int screenX ;
+    public final int screenY;
     public Player(GamePanel gp,KeyControl keyC){
         this.gp=gp;
         this.keyC=keyC;
+        screenX = gp.screenWidth/2-(gp.titleSize/2);
+        screenY = gp.screenHeight/2 - (gp.titleSize/2);
+        
+        solidArea = new Rectangle();
+        solidArea.x = 12;
+        solidArea.y = 20;
+        solidArea.width = 24;
+        solidArea.height = 28;
+        
         setDefaultValue();
         getPlayerImage();
     }
     public final void setDefaultValue(){
-        x = 100;
-        y = 100;
+        worldX = gp.titleSize * 23;
+        worldY = gp.titleSize * 21;
         speed = 4;
         direction ="down";
     }
     public final void getPlayerImage(){
         try{
-            up1 = ImageIO.read(new File("player/bodyup_1.png"));
-            up2 = ImageIO.read(new File("player/bodyup_2.png"));
-            down1 = ImageIO.read(new File("player/bodydown_1.png"));
-            down2 = ImageIO.read(new File("player/bodydown_2.png"));
-            right1 = ImageIO.read(new File("player/bodyright_1.png"));
-            right2 = ImageIO.read(new File("player/bodyright_2.png"));
-            left1 = ImageIO.read(new File("player/bodyleft_1.png"));
-            left2 = ImageIO.read(new File("player/bodyleft_2.png"));
+            up1 = ImageIO.read(new File("res/player/bodyup_1.png"));
+            up2 = ImageIO.read(new File("res/player/bodyup_2.png"));
+            down1 = ImageIO.read(new File("res/player/bodydown_1.png"));
+            down2 = ImageIO.read(new File("res/player/bodydown_2.png"));
+            right1 = ImageIO.read(new File("res/player/bodyright_1.png"));
+            right2 = ImageIO.read(new File("res/player/bodyright_2.png"));
+            left1 = ImageIO.read(new File("res/player/bodyleft_1.png"));
+            left2 = ImageIO.read(new File("res/player/bodyleft_2.png"));
         }
         catch(IOException e){
             e.printStackTrace();
@@ -50,20 +62,57 @@ public class Player extends Entity {
     public void update(){
         if(keyC.down==true||keyC.left==true||keyC.right==true||keyC.up==true){
             if(keyC.up == true){
-            direction = "up";
-            y -= speed;
-        }
-        if (keyC.down == true){
-            direction="down";
-            y += speed;
-        }
-        if (keyC.right == true){
-            direction = "right";
-            x += speed;
-        }
-        if (keyC.left == true){
-            direction = "left";
-            x -= speed;
+                direction = "up";
+            }
+            if (keyC.down == true){
+                direction="down";
+            }
+            if (keyC.right == true){
+                direction = "right";
+            }
+            if (keyC.left == true){
+                direction = "left";
+            }
+            if (keyC.up == true && keyC.left ==true){
+                direction = "upleft";
+            }
+            if(keyC.up == true && keyC.right == true){
+                direction = "upright";
+            }
+            if(keyC.down == true && keyC.left == true){
+                direction = "downleft";
+            }
+            if(keyC.down ==true &&keyC.right==true){
+                direction = "downright";
+            }
+        
+        // check collision
+        collisionOn = false;
+        gp.cChecker.checkTile(this);
+        // if collision = false player can move
+        if (collisionOn == false){
+            switch(direction){
+            case "up" -> worldY -= speed;
+            case "down" -> worldY += speed;
+            case "left" -> worldX -= speed;
+            case "right" -> worldX += speed;
+            case "upleft" -> {
+                worldY -= speed;
+                worldX -= speed;
+                }
+            case "upright" -> {
+                worldY -= speed;
+                worldX += speed;
+                }
+            case "downleft" -> {
+                worldY += speed;
+                worldX -= speed;
+                }
+            case "downright" -> {
+                worldY += speed;
+                worldX += speed;
+                }
+            }
         }
         spriteCount ++;
         if (spriteCount>12){
@@ -78,6 +127,7 @@ public class Player extends Entity {
       }
         
     }
+    
     public void draw(Graphics2D g2D){
 //        g2D.setColor(Color.red);
 //        
@@ -118,6 +168,6 @@ public class Player extends Entity {
                 }
             }
         }
-        g2D.drawImage(image, x, y, gp.titleSize, gp.titleSize, null);
+        g2D.drawImage(image, screenX, screenY, gp.titleSize, gp.titleSize, null);
     }
 }
